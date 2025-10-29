@@ -22,8 +22,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Camada de serviço para gerenciar a lógica de negócio dos Usuários.
@@ -126,7 +124,7 @@ public class UsuarioService {
         Usuario novoUsuario = new Usuario();
         novoUsuario.setNome(usuarioDTORequest.getNome());
         novoUsuario.setTelefone(usuarioDTORequest.getTelefone());
-        novoUsuario.setEmail(usuarioDTORequest.getEmail());
+        novoUsuario.setEmail(usuarioDTORequest.getEmail().toLowerCase());
 
         novoUsuario.setSenha(passwordEncoder.encode(usuarioDTORequest.getSenha()));
 
@@ -152,11 +150,11 @@ public class UsuarioService {
 
         // Autentica o usuário
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(usuarioLoginDTO.email(), usuarioLoginDTO.password())
+                new UsernamePasswordAuthenticationToken(usuarioLoginDTO.email().toLowerCase(), usuarioLoginDTO.senha())
         );
 
         // Busca usuário no banco
-        Usuario usuario = usuarioRepository.findByEmail(usuarioLoginDTO.email())
+        Usuario usuario = usuarioRepository.findByEmail(usuarioLoginDTO.email().toLowerCase())
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
         // Gera token JWT
