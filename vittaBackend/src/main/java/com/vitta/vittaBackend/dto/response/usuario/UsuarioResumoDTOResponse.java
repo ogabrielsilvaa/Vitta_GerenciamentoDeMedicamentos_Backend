@@ -43,6 +43,9 @@ public class UsuarioResumoDTOResponse {
         this.status = usuarioEntity.getStatus();
     }
 
+    public UsuarioResumoDTOResponse(Integer id, String nome, UsuarioStatus status) {
+    }
+
     public Integer getId() {
         return id;
     }

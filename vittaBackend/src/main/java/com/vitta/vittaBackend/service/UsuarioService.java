@@ -160,7 +160,15 @@ public class UsuarioService {
         // Gera token JWT
         String token = jwtTokenService.generateToken(new UserDetailsImpl(usuario));
 
-        return new RecoveryJwtTokenDto(token);
+        UsuarioLoginDTOResponse usuarioDTO = new UsuarioLoginDTOResponse(
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getTelefone(),
+                usuario.getEmail(),
+                usuario.getStatus()
+        );
+
+        return new RecoveryJwtTokenDto(token, usuarioDTO);
     }
 
     /**

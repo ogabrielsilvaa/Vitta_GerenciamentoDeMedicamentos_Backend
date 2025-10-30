@@ -69,6 +69,9 @@ public class UsuarioDTOResponse {
         }
     }
 
+    public UsuarioDTOResponse(Integer id, String nome, String telefone, String email, UsuarioStatus status) {
+    }
+
     public Integer getId() {
         return id;
     }
