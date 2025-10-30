@@ -21,6 +21,11 @@ public class TratamentoDTOResponse {
     private Integer id;
 
     /**
+     * Nome do tratamento.
+     */
+    private String nome;
+
+    /**
      * A dosagem a ser administrada em cada toma.
      */
     private BigDecimal dosagem;
@@ -89,6 +94,7 @@ public class TratamentoDTOResponse {
      */
     public TratamentoDTOResponse(Tratamento tratamentoEntity) {
         this.id = tratamentoEntity.getId();
+        this.nome = tratamentoEntity.getNome();
         this.dosagem = tratamentoEntity.getDosagem();
         this.instrucoes = tratamentoEntity.getInstrucoes();
         this.dataDeInicio = tratamentoEntity.getDataDeInicio();
@@ -122,6 +128,14 @@ public class TratamentoDTOResponse {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public BigDecimal getDosagem() {

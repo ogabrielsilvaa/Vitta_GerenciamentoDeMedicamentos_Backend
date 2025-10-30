@@ -100,6 +100,7 @@ public class TratamentoService {
         Tratamento tratamento = new Tratamento();
 
         tratamento.setMedicamento(medicamento);
+        tratamento.setNome(tratamentoDTORequest.getNome());
         tratamento.setDosagem(tratamentoDTORequest.getDosagem());
         tratamento.setInstrucoes(tratamentoDTORequest.getInstrucoes());
         tratamento.setDataDeInicio(tratamentoDTORequest.getDataDeInicio());
@@ -150,6 +151,9 @@ public class TratamentoService {
         boolean regerarAgendamentos = false;
         TipoDeAlerta tipoDeAlertaParaRegeracao = null;
 
+        if (tratamentoAtualizarDTORequest.getNome() != null) {
+            tratamentoExistente.setNome(tratamentoAtualizarDTORequest.getNome());
+        }
         if (tratamentoAtualizarDTORequest.getDosagem() != null) {
             tratamentoExistente.setDosagem(tratamentoAtualizarDTORequest.getDosagem());
         }

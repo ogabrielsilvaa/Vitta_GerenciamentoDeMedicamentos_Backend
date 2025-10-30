@@ -26,6 +26,12 @@ public class Tratamento {
     private Integer id;
 
     /**
+     * Nome do tratamento, para facilitar a identificação de cada um.
+     */
+    @Column(name = "tratamento_nome")
+    private String nome;
+
+    /**
      * A dosagem a ser administrada em cada toma (ex: 1.00 para um comprimido, 10.50 para 10.5 ml).
      */
     @Column(name = "tratamento_dosagem")
@@ -106,6 +112,14 @@ public class Tratamento {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public BigDecimal getDosagem() {

@@ -9,6 +9,11 @@ import java.time.LocalDate;
 public class TratamentoAtualizarDTORequest {
 
     /**
+     * Nome do tratamento, para facilitar a identificação de cada um.
+     */
+    private String nome;
+
+    /**
      * Dosagem a ser administrada em cada toma (ex: 1.00 para um comprimido).
      */
     private BigDecimal dosagem;
@@ -116,6 +121,14 @@ public class TratamentoAtualizarDTORequest {
         }
 
         return false;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public BigDecimal getDosagem() {
