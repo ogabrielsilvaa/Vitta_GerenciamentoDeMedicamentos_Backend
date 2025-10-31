@@ -18,6 +18,11 @@ public class TratamentoResumoDTOResponse {
     private Integer id;
 
     /**
+     * Nome do tratamento.
+     */
+    private String nome;
+
+    /**
      * A data em que o tratamento se inicia.
      */
     private LocalDate dataDeInicio;
@@ -43,6 +48,7 @@ public class TratamentoResumoDTOResponse {
      */
     public TratamentoResumoDTOResponse(Tratamento tratamentoEntity) {
         this.id = tratamentoEntity.getId();
+        this.nome = tratamentoEntity.getNome();
         this.dataDeInicio = tratamentoEntity.getDataDeInicio();
         this.dataDeTermino = tratamentoEntity.getDataDeTermino();
         this.status = tratamentoEntity.getStatus();
@@ -57,6 +63,14 @@ public class TratamentoResumoDTOResponse {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public LocalDate getDataDeInicio() {
