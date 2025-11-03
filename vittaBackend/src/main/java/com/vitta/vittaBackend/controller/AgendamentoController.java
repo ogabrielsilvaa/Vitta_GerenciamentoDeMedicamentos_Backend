@@ -11,11 +11,13 @@ import com.vitta.vittaBackend.service.AgendamentoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -40,10 +42,18 @@ public class AgendamentoController {
      * @return Uma lista de agendamentos do usuário.
      */
     @GetMapping("/listar")
-    @Operation(summary = "Listar meus Agendamentos.", description = "Endpoint para listar todos os Agendamentos do usuário logado.")
-    public ResponseEntity<List<AgendamentoDTOResponse>> listarAgendamentos(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    @Operation(summary = "Listar meus Agendamentos.", description = "Endpoint para listar todos os Agendamentos do usuário logado." +
+    "Permite filtrar por um intervalo de datas (dataInicio e dataFim).")
+    public ResponseEntity<List<AgendamentoDTOResponse>> listarAgendamentos(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)LocalDate dataInicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)LocalDate dataFim
+            ) {
         Integer usuarioId = userDetails.getUserId();
-        return ResponseEntity.ok(agendamentoService.listarAgendamentosDoUsuario(usuarioId));
+
+        List<AgendamentoDTOResponse> agendamentos = agendamentoService.listarAgendamentosDoUsuario(usuarioId, dataInicio, dataFim);
+
+        return ResponseEntity.ok(agendamentos);
     }
 
     /**
@@ -155,27 +165,6 @@ public class AgendamentoController {
         MedicamentoHistoricoDTOResponse respostaDTO = agendamentoService.concluirAgendamento(agendamentoId, requestDTO, usuarioId);
 
         return ResponseEntity.ok(respostaDTO);
-    }
-
-    /**
-     * Busca a agenda de medicamentos do dia para o usuário logado.
-     *
-     * @param userDetails O principal do usuário autenticado.
-     * @return ResponseEntity com a lista de agendamentos do dia e status 200 OK,
-     * ou status 204 No Content se não houver agendamentos para o dia.
-     */
-    @GetMapping("/minhaAgendaDoDia")
-    @Operation(summary = "Lista todos os agendamento do dia.", description = "Endpoint para verificar todos os agendamento do dia, do usuário logado.")
-    public ResponseEntity<List<AgendaDoDiaDTOResponse>> getAgendaDoDia(
-            @AuthenticationPrincipal UserDetailsImpl userDetails) {
-
-        Integer usuarioId = userDetails.getUserId();
-        List<AgendaDoDiaDTOResponse> agenda = agendamentoService.getAgendaDoDia(usuarioId);
-        if (agenda.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
-        return ResponseEntity.ok(agenda);
     }
 
 }

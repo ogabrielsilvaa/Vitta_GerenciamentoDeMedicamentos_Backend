@@ -60,12 +60,20 @@ public class AgendamentoService {
     }
 
     /**
-     * Lista todos os agendamentos ativos de um usuário específico.
+     * Lista os agendamentos ativos de um usuário, com filtros opcionais de data.
      * @param usuarioId O ID do usuário autenticado.
-     * @return Uma lista de AgendamentoDTOResponse.
+     * @param dataInicio Data inicial (opcional) para o filtro.
+     * @param dataFim Data final (opcional) para o filtro.
+     * @return Uma lista de AgendamentosDTOResponse
      */
-    public List<AgendamentoDTOResponse> listarAgendamentosDoUsuario(Integer usuarioId) {
-        return agendamentoRepository.listarAgendamentosAtivos(usuarioId)
+    public List<AgendamentoDTOResponse> listarAgendamentosDoUsuario(
+            Integer usuarioId, LocalDate dataInicio, LocalDate dataFim
+    ) {
+        LocalDateTime inicioIntervalo = (dataInicio != null) ? dataInicio.atStartOfDay() : null;
+
+        LocalDateTime fimIntervalo = (dataFim != null) ? dataFim.atTime(LocalTime.MAX) : null;
+
+        return agendamentoRepository.listarAgendamentosAtivos(usuarioId, inicioIntervalo, fimIntervalo)
                 .stream()
                 .map(AgendamentoDTOResponse::new)
                 .collect(Collectors.toList());
@@ -469,20 +477,6 @@ public class AgendamentoService {
         }
 
         return dto;
-    }
-
-    public List<AgendaDoDiaDTOResponse> getAgendaDoDia(Integer usuarioId) {
-        //define o intervalo de hoje
-        LocalDate hoje = LocalDate.now();
-        LocalDateTime inicioDoDia = hoje.atStartOfDay(); // Ex: 2025-09-17T00:00:00
-        LocalDateTime fimDoDia = hoje.atTime(LocalTime.MAX);   // Ex: 2025-09-17T23:59:59.999...
-
-        //busca o agendamento no banco de dados
-        List<Agendamento> agendamentosDoDia = agendamentoRepository.findAllByUsuarioAndPeriodo(usuarioId, inicioDoDia, fimDoDia);
-
-        return agendamentosDoDia.stream()
-                .map(this::converterParaResponseDTO)
-                .collect(Collectors.toList());
     }
 
     private AgendaDoDiaDTOResponse converterParaResponseDTO(Agendamento agendamento) {

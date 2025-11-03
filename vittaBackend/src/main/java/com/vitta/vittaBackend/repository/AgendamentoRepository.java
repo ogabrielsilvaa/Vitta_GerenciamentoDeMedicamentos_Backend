@@ -17,20 +17,28 @@ import java.util.Optional;
 public interface AgendamentoRepository extends JpaRepository<Agendamento, Integer> {
 
     /**
-     * Retorna uma lista de todos os agendamentos ativos de um usuário específico.
+     * Retorna uma lista de agendamentos ativos de um usuário, opcionalmente filtrada por data.
      * A consulta busca por agendamentos, tratamento e medicamento correspondentes,
      * que pertencem ao usuário logado e o status é maior que 0.
      *
      * @param usuarioId O ID do usuário dono dos agendamentos.
+     * @param dataInicio A data/hora inicial do filtro (se nulo, não filtra por início).
+     * @param dataFim A data/hora final do filtro (se nulo, não filtra por fim).
      * @return Uma lista de entidades {@link Agendamento} ativas para o usuário especificado.
      */
     @Query(
-//            "SELECT a FROM Agendamento a WHERE a.usuario.id = :usuarioId AND a.status > 0"
             "SELECT a FROM Agendamento a " +
                     "JOIN FETCH a.tratamento t " +
-                    "WHERE a.usuario.id = :usuarioId AND a.status > 0"
+                    "WHERE a.usuario.id = :usuarioId AND a.status > 0" +
+                    "AND (:dataInicio IS NULL OR a.horarioDoAgendamento >= :dataInicio) " +
+                    "AND (:dataFim IS NULL OR a.horarioDoAgendamento <= :dataFim) " +
+                    "ORDER BY a.horarioDoAgendamento ASC"
     )
-    List<Agendamento> listarAgendamentosAtivos(@Param("usuarioId") Integer usuarioId);
+    List<Agendamento> listarAgendamentosAtivos(
+            @Param("usuarioId") Integer usuarioId,
+            @Param("dataInicio") LocalDateTime dataInicio,
+            @Param("dataFim") LocalDateTime dataFim
+    );
 
     /**
      * Busca um agendamento específico pelo seu ID e pelo ID do usuário proprietário.
