@@ -1,47 +1,43 @@
 pipeline {
     agent any
+
     stages {
-        stage('Verificar Repositório') {
-            steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/main']], useRemoteConfigs: [[url: 'https://github.com/oj0rel/Vitta_GerenciamentoDeMedicamentos_Backend']]])
-            }
-        }
 
         stage('Instalar Dependências') {
             steps {
-                script {
-                    // Atualiza o PATH se necessário
-                    env.PATH = "/usr/bin:$PATH"
-                    // Instalar as dependências Maven antes de compilar o projeto
-                    bat 'mvn clean install'  // Instala as dependências do Maven
+                dir('vittaBackend') {
+                    script {
+                        bat 'mvn clean install'
+                    }
                 }
             }
         }
 
         stage('Construir Imagem Docker') {
             steps {
-                script {
-                    def appName = 'vitta'
-                    def imageTag = "${appName}:${env.BUILD_ID}"
+                dir('vittaBackend') {
+                    script {
+                        def appName = 'vitta-backend'
+                        def imageTag = "${appName}:${env.BUILD_ID}" // Ex: vitta-backend:1
 
-                    // Construir a imagem Docker
-                    bat "docker build -t ${imageTag} ."
+
+                        bat "docker build -t ${imageTag} ."
+
+
+                        bat "docker tag ${imageTag} ${appName}:latest"
+                    }
                 }
             }
         }
 
         stage('Fazer Deploy') {
             steps {
-                script {
-                    def appName = 'vittaBackend'
-                    def imageTag = "${appName}:${env.BUILD_ID}"
+                dir('vittaBackend') {
+                    script {
+                        def appName = 'vitta-backend'
 
-                    // Parar e remover o container existente, se houver
-            		bat "docker stop ${appName} || exit 0"
-            		bat "docker rm -v ${appName} || exit 0"  // Remover o container e os volumes associados
-
-                    // Executar o novo container
-                    //bat "docker-compose up -d --build"
+                        bat "docker-compose up -d --build"
+                    }
                 }
             }
         }
