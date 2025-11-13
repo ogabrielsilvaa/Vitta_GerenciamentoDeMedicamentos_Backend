@@ -36,7 +36,7 @@ pipeline {
                     script {
                         def appName = 'vitta-backend'
 
-                        // bat "docker-compose up -d --build"
+                        bat "docker-compose up -d --build"
                     }
                 }
             }
