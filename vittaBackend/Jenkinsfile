@@ -1,0 +1,53 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Instalar Dependências') {
+            steps {
+                dir('vittaBackend') {
+                    script {
+                        bat 'mvn clean install'
+                    }
+                }
+            }
+        }
+
+        stage('Construir Imagem Docker') {
+            steps {
+                dir('vittaBackend') {
+                    script {
+                        def appName = 'vitta-backend'
+                        def imageTag = "${appName}:${env.BUILD_ID}" // Ex: vitta-backend:1
+
+
+                        bat "docker build -t ${imageTag} ."
+
+
+                        bat "docker tag ${imageTag} ${appName}:latest"
+                    }
+                }
+            }
+        }
+
+        stage('Fazer Deploy') {
+            steps {
+                dir('vittaBackend') {
+                    script {
+                        def appName = 'vitta-backend'
+
+                        bat "docker-compose up -d --build"
+                    }
+                }
+            }
+        }
+    }
+    post {
+        success {
+            echo 'Deploy realizado com sucesso!'
+        }
+        failure {
+            echo 'Houve um erro durante o deploy.'
+        }
+    }
+}
