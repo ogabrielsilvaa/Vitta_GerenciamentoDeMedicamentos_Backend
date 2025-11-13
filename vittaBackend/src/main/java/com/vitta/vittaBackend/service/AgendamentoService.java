@@ -303,10 +303,8 @@ public class AgendamentoService {
     }
 
     /**
-     * Gera agendamentos futuros com base nas regras de um tratamento.
-     * <p>
-     * NOTA: Esta versão corrigida separa a lógica de INTERVALO_HORAS (contínua)
-     * da lógica de HORARIOS_ESPECIFICOS (diária).
+     * Gera agendamentos futuros com base nas regras de um tratamento,
+     * começando A PARTIR DE HOJE.
      *
      * @param tratamento A entidade {@link Tratamento} já salva, contendo as regras de agendamento.
      * @return Uma lista de novas entidades {@link Agendamento}, prontas para serem salvas no banco de dados.
@@ -314,14 +312,20 @@ public class AgendamentoService {
     public List<Agendamento> gerarAgendamentosFuturos(Tratamento tratamento, TipoDeAlerta tipoDeAlerta) {
         List<Agendamento> agendamentos = new ArrayList<>();
 
-        if (tratamento.getDataDeTermino() == null || tratamento.getDataDeTermino().isBefore(tratamento.getDataDeInicio())) {
-            logger.warn("Tratamento ID {} com datas inválidas. Data de início: {}, Data de término: {}",
-                    tratamento.getId(), tratamento.getDataDeInicio(), tratamento.getDataDeTermino());
+        LocalDate dataInicioGeracao = LocalDate.now();
+        LocalDate dataTerminoTratamento = tratamento.getDataDeTermino();
+
+        if (dataTerminoTratamento == null || dataTerminoTratamento.isBefore(dataInicioGeracao)) {
+            logger.warn("Tratamento ID {} com data de término no passado ({}). Nenhum agendamento futuro será gerado.",
+                    tratamento.getId(), dataTerminoTratamento);
             return agendamentos;
         }
 
-        LocalDateTime dataHoraTermino = tratamento.getDataDeTermino().atTime(LocalTime.MAX);
+        LocalDateTime dataHoraTermino = dataTerminoTratamento.atTime(LocalTime.MAX);
 
+        if (tratamento.getDataDeInicio().isAfter(dataInicioGeracao)) {
+            dataInicioGeracao = tratamento.getDataDeInicio();
+        }
 
         if (tratamento.getTipoDeFrequencia() == TipoFrequencia.INTERVALO_HORAS) {
 
@@ -332,7 +336,14 @@ public class AgendamentoService {
                 return agendamentos;
             }
 
-            LocalDateTime proximoAgendamento = tratamento.getDataDeInicio().atTime(8, 0);
+            LocalDateTime proximoAgendamento = dataInicioGeracao.atTime(8, 0);
+
+            if (tratamento.getDataDeInicio().isBefore(dataInicioGeracao)) {
+                LocalDateTime inicioOriginal = tratamento.getDataDeInicio().atTime(8, 0);
+                while (proximoAgendamento.isBefore(LocalDateTime.now())) {
+                    proximoAgendamento = proximoAgendamento.plusHours(intervalo);
+                }
+            }
 
             while (!proximoAgendamento.isAfter(dataHoraTermino)) {
                 agendamentos.add(criarAgendamento(tratamento, proximoAgendamento, tipoDeAlerta));
@@ -341,30 +352,31 @@ public class AgendamentoService {
 
         } else if (tratamento.getTipoDeFrequencia() == TipoFrequencia.HORARIOS_ESPECIFICOS) {
 
-            LocalDate dataCorrente = tratamento.getDataDeInicio();
+            if(tratamento.getHorariosEspecificos() == null || tratamento.getHorariosEspecificos().trim().isEmpty()) {
+                logger.warn("TipoFrequencia é HORARIOS_ESPECIFICOS mas getHorariosEspecificos() está vazio para o tratamento ID {}.",
+                        tratamento.getId());
+                return agendamentos;
+            }
 
-            while (!dataCorrente.isAfter(tratamento.getDataDeTermino())) {
+            String[] horarios = tratamento.getHorariosEspecificos().split(",");
 
-                if(tratamento.getHorariosEspecificos() == null || tratamento.getHorariosEspecificos().trim().isEmpty()) {
-                    logger.warn("TipoFrequencia é HORARIOS_ESPECIFICOS mas getHorariosEspecificos() está vazio para o tratamento ID {}.",
-                            tratamento.getId());
-                    break;
-                }
+            LocalDate dataCorrente = dataInicioGeracao;
 
-                String[] horarios = tratamento.getHorariosEspecificos().split(",");
-                for (String horaStr : horarios) {
+            while (!dataCorrente.isAfter(dataTerminoTratamento)) {
+
+                for (String horaStr: horarios) {
                     try {
                         LocalTime horario = LocalTime.parse(horaStr.trim());
                         LocalDateTime dataHoraAgendamento = LocalDateTime.of(dataCorrente, horario);
-
-                        if (!dataHoraAgendamento.isAfter(dataHoraTermino)) {
+                        if (dataHoraAgendamento.isAfter(LocalDateTime.now()) && !dataHoraAgendamento.isAfter(dataHoraTermino)) {
                             agendamentos.add(criarAgendamento(tratamento, dataHoraAgendamento, tipoDeAlerta));
                         }
-                    } catch (Exception e) {
+                    } catch (Exception error) {
                         logger.error("Erro ao parsear horário '{}' para o tratamento ID {}. Horário ignorado.",
-                                horaStr, tratamento.getId(), e);
+                                horaStr, tratamento.getId(), error);
                     }
                 }
+
                 dataCorrente = dataCorrente.plusDays(1);
             }
         }
