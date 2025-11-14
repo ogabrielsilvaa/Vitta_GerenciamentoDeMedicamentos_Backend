@@ -36,7 +36,7 @@ pipeline {
                     script {
                         def appName = 'vitta-backend'
 
-                        sh "docker-compose up -d --build"
+                        sh "docker run -d --name ${appName} -p 8407:8407 ${imageTag}"
                     }
                 }
             }

@@ -195,17 +195,12 @@ public class TratamentoService {
         }
 
         if (regerarAgendamentos) {
-            // remover os agendamentos futuros e pendentes DA COLEÇÃO em memória.
-            // o `orphanRemoval=true` cuidará da exclusão no banco.
             tratamentoExistente.getAgendamentos().removeIf(agendamento ->
                     agendamento.getStatus() == AgendamentoStatus.PENDENTE
             );
 
-            // Passo 2: Gerar os novos agendamentos (idealmente a partir de hoje).
-            // Criaremos uma versão melhorada do método de geração.
             List<Agendamento> novosAgendamentos = agendamentoService.gerarAgendamentosFuturos(tratamentoExistente, tipoDeAlertaParaRegeracao);
 
-            // Passo 3: Adicionar os novos agendamentos à coleção.
             if (novosAgendamentos != null && !novosAgendamentos.isEmpty()) {
                 tratamentoExistente.getAgendamentos().addAll(novosAgendamentos);
             }
