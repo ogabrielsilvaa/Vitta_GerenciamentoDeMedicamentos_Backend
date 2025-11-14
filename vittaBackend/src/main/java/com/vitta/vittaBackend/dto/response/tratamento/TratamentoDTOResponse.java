@@ -5,6 +5,7 @@ import com.vitta.vittaBackend.dto.response.medicamento.MedicamentoResumoDTORespo
 import com.vitta.vittaBackend.dto.response.usuario.UsuarioResumoDTOResponse;
 import com.vitta.vittaBackend.entity.Tratamento;
 import com.vitta.vittaBackend.enums.TipoFrequencia;
+import com.vitta.vittaBackend.enums.agendamento.TipoDeAlerta;
 import com.vitta.vittaBackend.enums.tratamento.TratamentoStatus;
 
 import java.math.BigDecimal;
@@ -66,6 +67,11 @@ public class TratamentoDTOResponse {
     private TratamentoStatus status;
 
     /**
+     * Tipo de alerta do tratamento que usa da classe Enum.
+     */
+    private TipoDeAlerta tipoDeAlerta;
+
+    /**
      * A lista de agendamentos gerados a partir deste tratamento.
      */
     private List<AgendamentoResumoDTOResponse> agendamentos;
@@ -118,6 +124,12 @@ public class TratamentoDTOResponse {
 
         if (tratamentoEntity.getMedicamento() != null) {
             this.medicamento = new MedicamentoResumoDTOResponse(tratamentoEntity.getMedicamento());
+        }
+
+        if (tratamentoEntity.getAgendamentos() != null && !tratamentoEntity.getAgendamentos().isEmpty()) {
+            this.tipoDeAlerta = tratamentoEntity.getAgendamentos().get(0).getTipoDeAlerta();
+        } else {
+            this.tipoDeAlerta = null;
         }
 
     }
@@ -200,6 +212,14 @@ public class TratamentoDTOResponse {
 
     public void setStatus(TratamentoStatus status) {
         this.status = status;
+    }
+
+    public TipoDeAlerta getTipoDeAlerta() {
+        return tipoDeAlerta;
+    }
+
+    public void setTipoDeAlerta(TipoDeAlerta tipoDeAlerta) {
+        this.tipoDeAlerta = tipoDeAlerta;
     }
 
     public List<AgendamentoResumoDTOResponse> getAgendamentos() {
