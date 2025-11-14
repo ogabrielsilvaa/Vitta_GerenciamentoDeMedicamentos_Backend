@@ -7,7 +7,7 @@ pipeline {
             steps {
                 dir('vittaBackend') {
                     script {
-                        bat 'mvn clean install'
+                        sh 'mvn clean install'
                     }
                 }
             }
@@ -21,10 +21,10 @@ pipeline {
                         def imageTag = "${appName}:${env.BUILD_ID}" // Ex: vitta-backend:1
 
 
-                        bat "docker build -t ${imageTag} ."
+                        sh "docker build -t ${imageTag} ."
 
 
-                        bat "docker tag ${imageTag} ${appName}:latest"
+                        sh "docker tag ${imageTag} ${appName}:latest"
                     }
                 }
             }
@@ -36,7 +36,7 @@ pipeline {
                     script {
                         def appName = 'vitta-backend'
 
-                        bat "docker-compose up -d --build"
+                        sh "docker-compose up -d --build"
                     }
                 }
             }
