@@ -2,4 +2,4 @@ services:
   app:
     build: .
     ports:
-      - "9090:9090"
+      - "8407:8407"
