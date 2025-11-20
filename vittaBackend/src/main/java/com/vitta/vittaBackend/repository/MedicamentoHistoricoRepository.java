@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -44,4 +45,22 @@ public interface MedicamentoHistoricoRepository extends JpaRepository<Medicament
     @Transactional
     @Query("UPDATE MedicamentoHistorico m SET m.historicoStatus = 0 WHERE m.id = :historicoId AND m.usuario.id = :usuarioId")
     void apagarLogicoMedicamentoHistorico(@Param("historicoId") Integer historicoId, @Param("usuarioId") Integer usuarioId);
+
+    /**
+     * Recupera a lista de históricos de uso de medicamentos de um usuário dentro de um período específico.
+     * <p>
+     * A consulta filtra os registros pelo ID do usuário e pelo intervalo de datas fornecido (inclusive).
+     * Os resultados são ordenados de forma decrescente pela hora do uso (do mais recente para o mais antigo),
+     * ideal para visualização em relatórios cronológicos.
+     *
+     * @param usuarioId  O ID do usuário proprietário dos históricos.
+     * @param dataInicio A data e hora de início do período de busca.
+     * @param dataFim    A data e hora de término do período de busca.
+     * @return Uma lista de entidades {@link MedicamentoHistorico} encontradas no intervalo especificado.
+     */
+    @Query("SELECT mh FROM MedicamentoHistorico mh " +
+            "WHERE mh.usuario.id = :usuarioId " +
+            "AND mh.horaDoUso BETWEEN :dataInicio AND :dataFim " +
+            "ORDER BY mh.horaDoUso DESC")
+    List<MedicamentoHistorico> listarHistoricoPorPeriodo(Integer usuarioId, LocalDateTime dataInicio, LocalDateTime dataFim);
 }
