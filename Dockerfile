@@ -64,6 +64,9 @@ WORKDIR /app
 # Copia o JAR do backend
 COPY --from=backend-build /vittaBackend/target/*.jar app.jar
 
+# Garante que a pasta exista (não é obrigatório, mas deixa claro)
+RUN mkdir -p /app/apk
+
 # Copia o APK gerado pelo estágio mobile
 COPY --from=mobile-build /vittaFrontend/android/app/build/outputs/apk/release/app-release.apk ./apk/app-release.apk
 
