@@ -1,0 +1,67 @@
+import { StyleSheet } from "react-native";
+
+export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: "center",
+    paddingTop: 50,
+    paddingHorizontal: 20,
+  },
+  avatarContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#f0f0f0',
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: '#1CBDCF',
+    elevation: 5,
+  },
+  userName: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: '#333',
+    marginTop: 15,
+    marginBottom: 30,
+    textAlign: "center",
+  },
+  infoContainer: {
+    width: "100%",
+    marginBottom: 40,
+  },
+  infoLabel: {
+    fontSize: 14,
+    color: '#888',
+    marginTop: 15,
+    textTransform: "uppercase",
+    fontWeight: "bold",
+  },
+  infoValue: {
+    fontSize: 18,
+    color: '#333',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+    paddingBottom: 5,
+    marginTop: 5,
+  },
+  logoutButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: '#ffebee',
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    borderRadius: 30,
+    width: "100%",
+    borderWidth: 1,
+    borderColor: '#ffcdd2',
+  },
+  logoutText: {
+    color: '#d32f2f',
+    fontSize: 16,
+    fontWeight: "bold",
+    marginLeft: 10,
+  },
+});
