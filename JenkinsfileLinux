@@ -2,53 +2,54 @@ pipeline {
     agent any
 
     stages {
+        stage('Verificar Repositório') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']], useRemoteConfigs: [[url: 'https://github.com/oj0rel/Vitta_GerenciamentoDeMedicamentos_Backend']]])
+            }
+        }
 
         stage('Instalar Dependências') {
             steps {
-                dir('vittaBackend') {
-                    script {
+                script {
+                    env.PATH = "/usr/bin:$PATH"
+
+                     dir('vittaBackend') {
                         sh 'mvn clean install'
-                    }
+                     }
+
                 }
             }
         }
 
         stage('Construir Imagem Docker') {
             steps {
-                dir('vittaBackend') {
-                    script {
-                        def appName = 'vitta-backend'
-                        def imageTag = "${appName}:${env.BUILD_ID}" // Ex: vitta-backend:1
-
-
-                        sh "docker build -t ${imageTag} ."
-
-
-                        sh "docker tag ${imageTag} ${appName}:latest"
-                        dir ('vittaBackend') {
-                            sh "docker build -t ${imageTag} ."
-                        }
-                    }
+                script {
+                    def appName = 'vitta'
+                    def imageTag = "${appName}:${env.BUILD_ID}"
+                    
+                    sh "docker build -t ${imageTag} ."
                 }
             }
         }
 
         stage('Fazer Deploy') {
             steps {
-                dir('vittaBackend') {
-                    script {
-                        def appName = 'vitta-backend'
-                        def imageTag = "${appName}:${env.BUILD_ID}"
+                script {
+                    def appName = 'vitta'
+                    def imageTag = "${appName}:${env.BUILD_ID}"
 
-                        sh "docker stop ${appName} || exit 0"
-                        sh "docker rm -v ${appName} || exit 0"
+                    // Para e remove container existente, se houver
+                    sh "docker stop ${appName} || exit 0"
+                    sh "docker rm -v ${appName} || exit 0"
 
-                        sh "docker run -d --name ${appName} -p 8407:8407 ${imageTag}"
-                    }
+                    // Executar o novo container
+                    sh "docker run -d --name ${appName} -p 8407:8407 ${imageTag}"
+
                 }
             }
         }
     }
+
     post {
         success {
             echo 'Deploy realizado com sucesso!'
@@ -57,5 +58,4 @@ pipeline {
             echo 'Houve um erro durante o deploy.'
         }
     }
-}
 }

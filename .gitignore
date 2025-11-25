@@ -1,3 +1,13 @@
-*.class
-*.xml
-*.iml
+# Ignorar cache do Expo (ISSO RESOLVE O SEU ERRO)
+.expo/
+vittaFrontend/.expo/
+
+# Ignorar node_modules
+node_modules/
+vittaFrontend/node_modules/
+
+# Ignorar builds nativas
+android/
+ios/
+vittaFrontend/android/
+vittaFrontend/ios/
