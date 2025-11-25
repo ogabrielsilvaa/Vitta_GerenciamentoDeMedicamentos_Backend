@@ -19,15 +19,13 @@ RUN mvn clean package -DskipTests
 #########################################
 # Aqui eu uso uma imagem baseada em Debian/Ubuntu
 # porque Android SDK não gosta muito de Alpine.
-FROM eclipse-temurin:17-jdk AS mobile-build
+FROM eclipse-temurin:17-jdk-jammy AS mobile-build
 
-# Instala Node, npm, etc. (exemplo simples, ajuste versões conforme seu projeto)
 RUN apt-get update && \
-    apt-get install -y curl git unzip && \
-    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
-    apt-get install -y nodejs && \
+    apt-get install -y curl git unzip nodejs npm && \
     npm install -g yarn && \
     rm -rf /var/lib/apt/lists/*
+
 
 # Instala Android SDK (modelo bem básico)
 ENV ANDROID_HOME=/opt/android-sdk
