@@ -2,54 +2,102 @@ pipeline {
     agent any
 
     stages {
+        // Stage opcional: Verificar Repositório (O Jenkins geralmente faz isso automático,
+        // mas mantive a estrutura lógica do exemplo se quiser garantir branches)
+        stage('Verificar Repositório') {
+             steps {
+                 // O checkout padrão do Jenkins usa as configurações do Job/Pipeline
+                 checkout scm
+             }
+        }
 
-        stage('Instalar Dependências') {
+        stage('Construir APK React Native') {
+            agent {
+                docker {
+                    // O exemplo usa node:18-alpine.
+                    // Nota: Se der erro de falta de Java/Android SDK, avise-me.
+                    image 'node:18-alpine'
+                    args '-u root' // Garante permissão para criar pastas
+                }
+            }
+            steps {
+                // SUBSTITUA 'NOME_DA_SUA_PASTA_REACT_NATIVE' PELO NOME DA PASTA DO APP
+                dir('NOME_DA_SUA_PASTA_REACT_NATIVE') {
+                    script {
+                        echo '--- Instalando Dependências do React Native ---'
+                        sh 'npm install'
+
+                        echo '--- Configurando Dependências Android ---'
+                        // O "|| true" evita que o pipeline pare se houver warnings irrelevantes
+                        sh 'cd android && ./gradlew dependencies || true'
+
+                        echo '--- Gerando APK (Release) ---'
+                        // Gera o APK para arquitetura arm64 (comum em celulares modernos)
+                        sh 'cd android && ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a'
+
+                        echo '--- Organizando Arquivos ---'
+                        sh 'mkdir -p apk'
+                        // Copia o APK gerado para uma pasta na raiz do workspace para fácil acesso
+                        sh 'cp android/app/build/outputs/apk/release/app-release.apk apk/vitta.apk'
+
+                        sh 'ls -la apk/'
+                    }
+                }
+            }
+        }
+
+        stage('Instalar Dependências Backend') {
             steps {
                 dir('vittaBackend') {
                     script {
+                        // Adicionei a configuração de PATH do exemplo para garantir compatibilidade
+                        env.PATH = "/usr/bin:$PATH"
                         sh 'mvn clean install'
                     }
                 }
             }
         }
 
-        stage('Construir Imagem Docker') {
+        stage('Construir Imagem Docker Backend') {
             steps {
-                    script {
-                        def appName = 'vitta-backend'
-                        def imageTag = "${appName}:${env.BUILD_ID}" // Ex: vitta-backend:1
+                script {
+                    def appName = 'vitta-backend'
+                    def imageTag = "${appName}:${env.BUILD_ID}"
 
-
-
-                        dir ('vittaBackend') {
-                            sh "docker build -t ${imageTag} ."
-                        }
-                    }
-            }
-        }
-
-        stage('Fazer Deploy') {
-            steps {
-                dir('vittaBackend') {
-                    script {
-                        def appName = 'vitta-backend'
-                        def imageTag = "${appName}:${env.BUILD_ID}"
-
-                        sh "docker stop ${appName} || exit 0"
-                        sh "docker rm -v ${appName} || exit 0"
-
-                        sh "docker run -d --name ${appName} -p 8407:8407 ${imageTag}"
+                    dir ('vittaBackend') {
+                        sh "docker build -t ${imageTag} ."
                     }
                 }
             }
         }
+
+        stage('Fazer Deploy Backend') {
+            steps {
+                // Não é necessário entrar no dir('vittaBackend') apenas para rodar comandos docker globais,
+                // mas mantive a estrutura do script original.
+                script {
+                    def appName = 'vitta-backend'
+                    def imageTag = "${appName}:${env.BUILD_ID}"
+
+                    // Para e remove container existente, se houver
+                    sh "docker stop ${appName} || exit 0"
+                    sh "docker rm -v ${appName} || exit 0"
+
+                    // Executar o novo container na porta 8407 (Vitta)
+                    sh "docker run -d --name ${appName} -p 8407:8407 ${imageTag}"
+                }
+            }
+        }
     }
+
     post {
         success {
-            echo 'Deploy realizado com sucesso!'
+            echo 'Pipeline do Vitta finalizada com sucesso! APK e Backend atualizados.'
+            // Opcional: Arquivar o APK no Jenkins para download
+            // archiveArtifacts artifacts: '**/apk/*.apk', allowEmptyArchive: true
         }
         failure {
-            echo 'Houve um erro durante o deploy.'
+            echo 'Houve um erro durante o processo.'
         }
     }
 }
