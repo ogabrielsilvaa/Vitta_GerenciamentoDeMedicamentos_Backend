@@ -41,7 +41,7 @@ RUN mkdir -p $ANDROID_HOME/cmdline-tools && \
 WORKDIR /vittaFrontend
 
 # Dependências do RN
-COPY vittaFrontend/package.json mobile/yarn.lock ./
+COPY vittaFrontend/package.json vittaFrontend/package.json ./
 RUN npm install
 
 # Copia o restante do projeto mobile
