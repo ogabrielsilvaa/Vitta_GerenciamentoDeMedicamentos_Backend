@@ -42,7 +42,7 @@ WORKDIR /vittaFrontend
 
 # Dependências do RN
 COPY vittaFrontend/package.json mobile/yarn.lock ./
-RUN yarn install
+RUN npm install
 
 # Copia o restante do projeto mobile
 COPY vittaFrontend/ .
