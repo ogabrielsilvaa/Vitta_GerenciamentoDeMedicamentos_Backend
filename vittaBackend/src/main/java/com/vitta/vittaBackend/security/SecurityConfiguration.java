@@ -38,6 +38,22 @@ public class SecurityConfiguration {
             "/api/usuarios/login"
     };
 
+    public static final String[] ENDPOINTS_SEM_AUTENTICACAO = {
+            "/",
+            "/install",
+            "/download-apk",
+            "/index.html",
+            "/install.html",
+            "/app-release.apk",
+    };
+
+    public static final String[] ENDPOINTS_WEB_PAGES = {
+            "/",
+            "/install",
+            "/download-apk",
+            "/download/app"
+    };
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -50,6 +66,11 @@ public class SecurityConfiguration {
 
                         // Libera criação de usuário e login sem token
                         .requestMatchers(AUTENTICACAO_ENDPOINTS).permitAll()
+
+                        .requestMatchers(ENDPOINTS_SEM_AUTENTICACAO).permitAll()
+
+                        .requestMatchers(ENDPOINTS_WEB_PAGES).permitAll()
+
 
                         // Endpoints de teste com suas respectivas permissões
                         .requestMatchers("/api/usuarios/test").authenticated()

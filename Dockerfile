@@ -19,7 +19,7 @@ RUN mvn clean package -DskipTests
 #########################################
 # Aqui eu uso uma imagem baseada em Debian/Ubuntu
 # porque Android SDK não gosta muito de Alpine.
-FROM openjdk:17-jdk AS mobile-build
+FROM eclipse-temurin:17-jdk AS mobile-build
 
 # Instala Node, npm, etc. (exemplo simples, ajuste versões conforme seu projeto)
 RUN apt-get update && \
