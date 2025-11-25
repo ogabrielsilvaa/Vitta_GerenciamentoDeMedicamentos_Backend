@@ -22,7 +22,9 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:17-jdk-jammy AS mobile-build
 
 RUN apt-get update && \
-    apt-get install -y curl git unzip nodejs npm && \
+    apt-get install -y curl git unzip gnupg ca-certificates && \
+    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
+    apt-get install -y nodejs && \
     npm install -g yarn && \
     rm -rf /var/lib/apt/lists/*
 
