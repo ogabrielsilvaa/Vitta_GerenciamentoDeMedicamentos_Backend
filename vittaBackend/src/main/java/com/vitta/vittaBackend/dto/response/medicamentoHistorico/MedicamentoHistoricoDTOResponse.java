@@ -2,6 +2,7 @@ package com.vitta.vittaBackend.dto.response.medicamentoHistorico;
 
 import com.vitta.vittaBackend.dto.response.agendamento.AgendamentoResumoDTOResponse;
 import com.vitta.vittaBackend.dto.response.medicamento.MedicamentoResumoDTOResponse;
+import com.vitta.vittaBackend.dto.response.tratamento.TratamentoResumoDTOResponse;
 import com.vitta.vittaBackend.entity.MedicamentoHistorico;
 import com.vitta.vittaBackend.enums.GeralStatus;
 
@@ -14,8 +15,12 @@ public class MedicamentoHistoricoDTOResponse {
     private BigDecimal doseTomada;
     private String observacao;
     private GeralStatus historicoStatus;
+    private TratamentoResumoDTOResponse tratamento;
     private AgendamentoResumoDTOResponse agendamento;
     private MedicamentoResumoDTOResponse medicamento;
+
+    private String nomeTratamento;
+    private String nomeMedicamento;
 
     public MedicamentoHistoricoDTOResponse() {
     }
@@ -27,19 +32,29 @@ public class MedicamentoHistoricoDTOResponse {
         this.observacao = historicoEntity.getObservacao();
         this.historicoStatus = historicoEntity.getHistoricoStatus();
 
-        // Converte também o medicamento aninhado
         if (historicoEntity.getAgendamento() != null) {
             this.agendamento = new AgendamentoResumoDTOResponse(historicoEntity.getAgendamento());
+
+            if (historicoEntity.getAgendamento().getTratamento() != null) {
+                this.tratamento = new TratamentoResumoDTOResponse(historicoEntity.getAgendamento().getTratamento());
+
+                if (historicoEntity.getAgendamento().getTratamento().getMedicamento() != null) {
+                    this.medicamento = new MedicamentoResumoDTOResponse(historicoEntity.getAgendamento().getTratamento().getMedicamento());
+                }
+            }
         }
 
-        // navegação para buscar a informação do medicamento para registrar no historico
-        if (historicoEntity.getAgendamento() != null &&
-                historicoEntity.getAgendamento().getTratamento() != null &&
-                historicoEntity.getAgendamento().getTratamento().getMedicamento() != null) {
+        if (historicoEntity.getAgendamento() != null && historicoEntity.getAgendamento().getTratamento() != null) {
+            this.nomeTratamento = historicoEntity.getAgendamento().getTratamento().getNome();
 
-            this.medicamento = new MedicamentoResumoDTOResponse(
-                    historicoEntity.getAgendamento().getTratamento().getMedicamento()
-            );
+            if (historicoEntity.getAgendamento().getTratamento().getMedicamento() != null) {
+                this.nomeMedicamento = historicoEntity.getAgendamento().getTratamento().getMedicamento().getNome();
+            } else {
+                this.nomeMedicamento = "Medicamento Excluído";
+            }
+        } else {
+            this.nomeTratamento = "Tratamento Excluído";
+            this.nomeMedicamento = "-";
         }
     }
 
@@ -83,6 +98,14 @@ public class MedicamentoHistoricoDTOResponse {
         this.historicoStatus = historicoStatus;
     }
 
+    public TratamentoResumoDTOResponse getTratamento() {
+        return tratamento;
+    }
+
+    public void setTratamento(TratamentoResumoDTOResponse tratamento) {
+        this.tratamento = tratamento;
+    }
+
     public AgendamentoResumoDTOResponse getAgendamento() {
         return agendamento;
     }
@@ -97,5 +120,21 @@ public class MedicamentoHistoricoDTOResponse {
 
     public void setMedicamento(MedicamentoResumoDTOResponse medicamento) {
         this.medicamento = medicamento;
+    }
+
+    public String getNomeTratamento() {
+        return nomeTratamento;
+    }
+
+    public void setNomeTratamento(String nomeTratamento) {
+        this.nomeTratamento = nomeTratamento;
+    }
+
+    public String getNomeMedicamento() {
+        return nomeMedicamento;
+    }
+
+    public void setNomeMedicamento(String nomeMedicamento) {
+        this.nomeMedicamento = nomeMedicamento;
     }
 }

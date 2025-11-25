@@ -126,4 +126,16 @@ public class MedicamentoHistoricoController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Retorna os dados do histórico do mês atual (JSON) para o App gerar o PDF.
+     */
+    @GetMapping("/relatorio-mensal-dados")
+    public ResponseEntity<List<MedicamentoHistoricoDTOResponse>> buscarDadosRelatorioMensal(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        Integer usuarioId = userDetails.getUserId();
+
+        List<MedicamentoHistoricoDTOResponse> dados = medicamentoHistoricoService.listarDadosRelatorioMensal(usuarioId);
+
+        return ResponseEntity.ok(dados);
+    }
+
 }

@@ -161,7 +161,6 @@ public class TratamentoService {
             tratamentoExistente.setInstrucoes(tratamentoAtualizarDTORequest.getInstrucoes());
         }
 
-        // fazer verificação para ver se a estrutura do agendamento mudou (datas, frequência)
         if (tratamentoAtualizarDTORequest.getDataDeInicio() != null && !tratamentoAtualizarDTORequest.getDataDeInicio().equals(tratamentoExistente.getDataDeInicio())) {
             tratamentoExistente.setDataDeInicio(tratamentoAtualizarDTORequest.getDataDeInicio());
             regerarAgendamentos = true;
@@ -170,24 +169,35 @@ public class TratamentoService {
             tratamentoExistente.setDataDeTermino(tratamentoAtualizarDTORequest.getDataDeTermino());
             regerarAgendamentos = true;
         }
+
         if (tratamentoAtualizarDTORequest.getTipoDeFrequencia() != null) {
             TipoFrequencia novaFrequencia = TipoFrequencia.fromCodigo(tratamentoAtualizarDTORequest.getTipoDeFrequencia());
+
             if (novaFrequencia != tratamentoExistente.getTipoDeFrequencia()) {
                 tratamentoExistente.setTipoDeFrequencia(novaFrequencia);
                 regerarAgendamentos = true;
             }
-            // sempre atualiza os campos de frequência se o tipo for enviado
-            tratamentoExistente.setIntervaloEmHoras(tratamentoAtualizarDTORequest.getIntervaloEmHoras());
-            tratamentoExistente.setHorariosEspecificos(tratamentoAtualizarDTORequest.getHorariosEspecificos());
+
+            if (tratamentoAtualizarDTORequest.getIntervaloEmHoras() != null &&
+                    !tratamentoAtualizarDTORequest.getIntervaloEmHoras().equals(tratamentoExistente.getIntervaloEmHoras())) {
+                tratamentoExistente.setIntervaloEmHoras(tratamentoAtualizarDTORequest.getIntervaloEmHoras());
+                regerarAgendamentos = true;
+            }
+
+            if (tratamentoAtualizarDTORequest.getHorariosEspecificos() != null &&
+                    !tratamentoAtualizarDTORequest.getHorariosEspecificos().equals(tratamentoExistente.getHorariosEspecificos())) {
+                tratamentoExistente.setHorariosEspecificos(tratamentoAtualizarDTORequest.getHorariosEspecificos());
+                regerarAgendamentos = true;
+            }
         }
 
-        // verificar se o tipo de alerta mudou (isso também força a regeração)
         if (tratamentoAtualizarDTORequest.getTipoDeAlerta() != null) {
-            tipoDeAlertaParaRegeracao = TipoDeAlerta.fromCodigo(tratamentoAtualizarDTORequest.getTipoDeAlerta());
+            TipoDeAlerta novoAlerta = TipoDeAlerta.fromCodigo(tratamentoAtualizarDTORequest.getTipoDeAlerta());
+
+            tipoDeAlertaParaRegeracao = novoAlerta;
             regerarAgendamentos = true;
+
         } else if (regerarAgendamentos) {
-            // se precisa regerar, mas o alerta não foi alterado, precisamos buscar o alerta atual
-            // para manter a consistência.
             tipoDeAlertaParaRegeracao = tratamentoExistente.getAgendamentos().stream()
                     .findFirst()
                     .map(Agendamento::getTipoDeAlerta)
