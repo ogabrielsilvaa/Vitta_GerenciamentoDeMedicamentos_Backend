@@ -49,6 +49,8 @@ RUN npm install
 # Copia o restante do projeto mobile
 COPY vittaFrontend/ .
 
+RUN npx expo prebuild --platform android
+
 # Dá permissão e gera o APK release
 WORKDIR /vittaFrontend/android
 RUN chmod +x ./gradlew && \
