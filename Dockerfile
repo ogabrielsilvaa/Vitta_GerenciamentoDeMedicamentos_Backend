@@ -19,7 +19,7 @@ RUN mvn clean package -DskipTests
 #########################################
 # Aqui eu uso uma imagem baseada em Debian/Ubuntu
 # porque Android SDK não gosta muito de Alpine.
-FROM eclipse-temurin:17-jdk-jammy AS mobile-build
+FROM eclipse-temurin:21-jdk-jammy AS mobile-build
 
 RUN apt-get update && \
     apt-get install -y curl git unzip gnupg ca-certificates && \
