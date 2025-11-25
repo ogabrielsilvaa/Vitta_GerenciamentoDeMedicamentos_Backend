@@ -269,4 +269,20 @@ public class TratamentoService {
         }
     }
 
+    /**
+     * Encerra um tratamento manualmente, removendo agendamentos futuros
+     * e marcando como CONCLUÍDO (para fins de histórico).
+     */
+    @Transactional
+    public void encerrarTratamento(Integer tratamentoId, Integer usuarioId) {
+        Tratamento tratamento = validarTratamento(tratamentoId, usuarioId);
+
+        tratamento.getAgendamentos().removeIf(agendamento ->
+                agendamento.getStatus() == AgendamentoStatus.PENDENTE);
+
+        tratamento.setStatus(TratamentoStatus.CONCLUIDO);
+
+        tratamentoRepository.save(tratamento);
+    }
+
 }

@@ -118,4 +118,16 @@ public class TratamentoController {
         tratamentoService.deletarLogico(tratamentoId, usuarioId);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/encerrar/{tratamentoId}")
+    @Operation(summary = "Encerrar um Tratamento.",
+            description = "Endpoint para encerrar um Tratamento, pelo ID.")
+    public ResponseEntity<Void> encerrarTratamento(
+            @PathVariable("tratamentoId") Integer tratamentoId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        Integer usuarioId = userDetails.getUserId();
+        tratamentoService.encerrarTratamento(tratamentoId, usuarioId);
+        return ResponseEntity.noContent().build();
+    }
 }
