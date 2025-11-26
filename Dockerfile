@@ -1,7 +1,6 @@
 ############################
 # 1) Build do BACKEND Java #
 ############################
-# ATENÇÃO: O nome "backend-build" aqui é OBRIGATÓRIO para o estágio final funcionar
 FROM maven:3.9.9-amazoncorretto-21-alpine AS backend-build
 WORKDIR /vittaBackend
 COPY vittaBackend/pom.xml .
@@ -16,17 +15,20 @@ FROM ubuntu:22.04 AS mobile-build
 
 WORKDIR /vittaFrontend
 
-# 2.1) Instalar dependências (incluindo o Java 17)
+# 2.1) Instalar dependências (Essencial: Compiladores C++ para a Nova Arquitetura)
 RUN apt-get update && apt-get install -y \
     openjdk-17-jdk \
     curl \
     unzip \
     git \
+    build-essential \
+    cmake \
+    ninja-build \
     && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
-# 2.2) Configurar Variável JAVA_HOME (CRUCIAL para o Gradle não falhar)
+# 2.2) Configurar Variável JAVA_HOME
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 ENV PATH=$JAVA_HOME/bin:$PATH
 
@@ -51,21 +53,23 @@ RUN npm install
 
 COPY vittaFrontend/ .
 
-# 2.7) Prebuild (Gera a pasta android limpa)
+# 2.7) Prebuild
 RUN npx expo prebuild --platform android --clean
 
-# 2.8) Rodar o Gradle (Build Nativo)
+# 2.8) Rodar o Gradle (Build Nativo) com ESTRATÉGIA DE SOBREVIVÊNCIA
 WORKDIR /vittaFrontend/android
 RUN chmod +x gradlew
 
-# COMANDO BLINDADO:
-# - Define Java Home explicitamente
-# - Desativa Nova Arquitetura para economizar RAM
-# - Limita uso de memória do Java
-RUN ./gradlew clean assembleDebug \
+# --- AQUI ESTÁ A MÁGICA ---
+# -PnewArchEnabled=true: Ativamos o que as bibliotecas pedem.
+# --max-workers=1: OBRIGATÓRIO. Impede o pico de memória. Um arquivo por vez.
+# -Xmx2g: Limitamos o Java a 2GB para sobrar RAM para o compilador C++ (que roda fora do Java).
+RUN ./gradlew assembleDebug \
+    --no-daemon \
+    --max-workers=1 \
     -Dorg.gradle.java.home=/usr/lib/jvm/java-17-openjdk-amd64 \
-    -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=512m" \
-    -PnewArchEnabled=false
+    -Dorg.gradle.jvmargs="-Xmx2g -XX:MaxMetaspaceSize=512m" \
+    -PnewArchEnabled=true
 
 #########################################
 # 3) Imagem FINAL (Junta tudo)          #
@@ -74,13 +78,13 @@ FROM amazoncorretto:21-alpine
 
 WORKDIR /app
 
-# Pega o JAR do backend (da etapa 1)
+# Pega o JAR do backend
 COPY --from=backend-build /vittaBackend/target/*.jar app.jar
 
 # Cria pasta apk
 RUN mkdir -p /app/apk
 
-# Pega o APK gerado (da etapa 2)
+# Pega o APK gerado
 COPY --from=mobile-build /vittaFrontend/android/app/build/outputs/apk/debug/app-debug.apk /app/apk/vitta-app.apk
 
 EXPOSE 8407
