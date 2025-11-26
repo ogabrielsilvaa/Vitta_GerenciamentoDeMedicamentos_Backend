@@ -2,77 +2,56 @@
 # 1) Build do BACKEND Java #
 ############################
 FROM maven:3.9.9-amazoncorretto-21-alpine AS backend-build
-
 WORKDIR /vittaBackend
-
-# Copia apenas o necessário para cachear melhor
 COPY vittaBackend/pom.xml .
 RUN mvn dependency:go-offline
-
 COPY vittaBackend/src ./src
 RUN mvn clean package -DskipTests
 
-
-
-#########################################
-# 2) Build do APK React Native (Android)#
-#########################################
-# Aqui eu uso uma imagem baseada em Debian/Ubuntu
-# porque Android SDK não gosta muito de Alpine.
-FROM eclipse-temurin:21-jdk-jammy AS mobile-build
-
-RUN apt-get update && \
-    apt-get install -y curl git unzip gnupg ca-certificates && \
-    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
-    apt-get install -y nodejs && \
-    npm install -g yarn && \
-    rm -rf /var/lib/apt/lists/*
-
-
-# Instala Android SDK (modelo bem básico)
-ENV ANDROID_HOME=/opt/android-sdk
-ENV PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
-
-RUN mkdir -p $ANDROID_HOME/cmdline-tools && \
-    curl -Lo sdk.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip && \
-    unzip sdk.zip -d $ANDROID_HOME/cmdline-tools && \
-    rm sdk.zip && \
-    mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest && \
-    yes | sdkmanager --sdk_root=${ANDROID_HOME} "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+##############################################
+# 2) Build do MOBILE (Via EAS Cloud Manager) #
+##############################################
+FROM node:20-alpine AS mobile-build
 
 WORKDIR /vittaFrontend
 
-# Dependências do RN
-COPY vittaFrontend/package.json vittaFrontend/package.json ./
+# Instala o EAS CLI globalmente
+RUN npm install -g eas-cli
+
+# Copia os arquivos do projeto mobile
+COPY vittaFrontend/package.json vittaFrontend/yarn.lock* vittaFrontend/package-lock.json* ./
 RUN npm install
 
-# Copia o restante do projeto mobile
+# Copia o código fonte do mobile
 COPY vittaFrontend/ .
 
-RUN npx expo prebuild --platform android
+# ARGUMENTO DE BUILD: O Token precisa ser passado na hora do build
+ARG EXPO_TOKEN
+ENV EXPO_TOKEN=$EXPO_TOKEN
 
-# Dá permissão e gera o APK release
-WORKDIR /vittaFrontend/android
-RUN chmod +x ./gradlew && \
-    ./gradlew assembleRelease
-
-
+# O COMANDO MÁGICO:
+# 1. --profile preview: Usa seu perfil de APK
+# 2. --platform android: Só Android
+# 3. --non-interactive: Não faz perguntas
+# 4. --wait: O Docker fica parado esperando o build acabar
+# 5. --output: Quando acabar, SALVA O ARQUIVO nesta pasta com este nome
+RUN eas build --platform android --profile preview --non-interactive --output ./app-release.apk
 
 #########################################
-# 3) Imagem final de runtime do backend #
+# 3) Imagem FINAL (Junta tudo)          #
 #########################################
 FROM amazoncorretto:21-alpine
 
 WORKDIR /app
 
-# Copia o JAR do backend
+# Pega o JAR do backend
 COPY --from=backend-build /vittaBackend/target/*.jar app.jar
 
-# Garante que a pasta exista (não é obrigatório, mas deixa claro)
+# Cria pasta apk
 RUN mkdir -p /app/apk
 
-# Copia o APK gerado pelo estágio mobile
-COPY --from=mobile-build /vittaFrontend/android/app/build/outputs/apk/release/app-release.apk ./apk/app-release.apk
+# Pega o APK que foi baixado no estágio 2
+COPY --from=mobile-build /vittaFrontend/app-release.apk /app/apk/app-release.apk
 
 EXPOSE 8407
 

@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    environment {
+        APP_NAME = 'vitta-app'
+        IMAGE_TAG = "${APP_NAME}:${BUILD_ID}"
+    }
+
     stages {
         stage('Verificar Repositório') {
             steps {
@@ -8,54 +13,43 @@ pipeline {
             }
         }
 
-        stage('Instalar Dependências') {
+        // REMOVI o stage de "Instalar Dependências" (Maven)
+        // Motivo: Seu Dockerfile já faz o build do Maven na etapa 1. Fazer aqui seria trabalho duplicado.
+
+        stage('Construir Imagem Full Stack') {
             steps {
                 script {
-                    env.PATH = "/usr/bin:$PATH"
-
-                     dir('vittaBackend') {
-                        sh 'mvn clean install'
-                     }
-
+                    withCredentials([string(credentialsId: 'expo-token-secret', variable: 'ENV_EXPO_TOKEN')]) {
+                        
+                        echo "Iniciando build do Backend (Java) e Frontend (APK) via Docker..."
+                        
+                        // O comando é executado na RAIZ (.)
+                        // Passamos o token para o Dockerfile usar no estágio do mobile
+                        sh "docker build --build-arg EXPO_TOKEN=${ENV_EXPO_TOKEN} -t ${env.IMAGE_TAG} ."
+                    }
                 }
             }
         }
 
-        stage('Construir Imagem Docker') {
+        stage('Deploy / Rodar') {
             steps {
                 script {
-                    def appName = 'vitta'
-                    def imageTag = "${appName}:${env.BUILD_ID}"
-                    
-                    sh "docker build -t ${imageTag} ."
-                }
-            }
-        }
+                    sh "docker stop ${env.APP_NAME} || true"
+                    sh "docker rm -v ${env.APP_NAME} || true"
 
-        stage('Fazer Deploy') {
-            steps {
-                script {
-                    def appName = 'vitta'
-                    def imageTag = "${appName}:${env.BUILD_ID}"
-
-                    // Para e remove container existente, se houver
-                    sh "docker stop ${appName} || exit 0"
-                    sh "docker rm -v ${appName} || exit 0"
-
-                    // Executar o novo container
-                    sh "docker run -d --name ${appName} -p 8407:8407 ${imageTag}"
-
+                    // Roda a imagem final que tem o JAR rodando e o APK salvo na pasta /app/apk
+                    sh "docker run -d --name ${env.APP_NAME} -p 8407:8407 ${env.IMAGE_TAG}"
                 }
             }
         }
     }
-
+    
     post {
         success {
-            echo 'Deploy realizado com sucesso!'
+            echo 'Build completo! Backend rodando e APK gerado dentro do container.'
         }
         failure {
-            echo 'Houve um erro durante o deploy.'
+            echo 'Falha no build.'
         }
     }
 }
