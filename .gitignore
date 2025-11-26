@@ -7,9 +7,7 @@ node_modules/
 vittaFrontend/node_modules/
 
 # Ignorar builds nativas
-android/
 ios/
-vittaFrontend/android/
 vittaFrontend/ios/
 
 *.class
