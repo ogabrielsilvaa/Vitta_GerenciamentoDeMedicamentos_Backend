@@ -11,3 +11,6 @@ android/
 ios/
 vittaFrontend/android/
 vittaFrontend/ios/
+
+*.class
+vittaBackend/*.class
