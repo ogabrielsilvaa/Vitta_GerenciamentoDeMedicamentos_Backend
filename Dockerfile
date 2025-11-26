@@ -51,7 +51,7 @@ COPY vittaFrontend/ .
 
 # 2.6) Gerar a pasta android (Prebuild)
 # Isso cria a pasta /android baseada no seu app.json
-RUN npx expo prebuild --platform android --no-interactive
+RUN npx expo prebuild --platform android --clean
 
 # 2.7) Rodar o Gradle (Build Nativo)
 WORKDIR /vittaFrontend/android
