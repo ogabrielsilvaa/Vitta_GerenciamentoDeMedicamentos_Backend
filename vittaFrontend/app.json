@@ -7,7 +7,7 @@
     "icon": "./src/assets/images/icon.png",
     "scheme": "vitta",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "router": {
       "root": "src/app"
     },

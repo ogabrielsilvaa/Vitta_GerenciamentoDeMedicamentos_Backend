@@ -58,7 +58,11 @@ WORKDIR /vittaFrontend/android
 RUN chmod +x gradlew
 # Aqui geramos o APK de DEBUG (assembleDebug) como você testou.
 # O arquivo sairá em: android/app/build/outputs/apk/debug/app-debug.apk
-RUN ./gradlew assembleDebug
+# 2.7) Rodar o Gradle (Build Nativo)
+WORKDIR /vittaFrontend/android
+RUN chmod +x gradlew
+# Adicionamos flag para limitar o Java a 4GB (ajuste conforme sua RAM) e evitar travar o sistema
+RUN ./gradlew assembleDebug -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=512m"
 
 #########################################
 # 3) Imagem FINAL (Junta tudo)          #
