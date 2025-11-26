@@ -26,32 +26,25 @@ public class SecurityConfiguration {
     @Autowired
     private UserAuthenticationFilter userAuthenticationFilter;
 
-    // Adicione esta constante com os endpoints do Swagger
     private static final String[] SWAGGER_ENDPOINTS = {
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/swagger-resources/**",
     };
 
-    private static final String[] AUTENTICACAO_ENDPOINTS = {
+    private static final String[] PUBLIC_ENDPOINTS = {
             "/api/usuarios/cadastrar",
-            "/api/usuarios/login"
-    };
-
-    public static final String[] ENDPOINTS_SEM_AUTENTICACAO = {
+            "/api/usuarios/login",
             "/",
-            "/install",
-            "/download-apk",
             "/index.html",
             "/install.html",
-            "/app-release.apk",
-    };
-
-    public static final String[] ENDPOINTS_WEB_PAGES = {
-            "/",
             "/install",
-            "/download-apk",
-            "/download/app"
+            "/download/app",
+            "/*.html",
+            "/*.css",
+            "/*.js",
+            "/favicon.ico",
+            "/assets/**"
     };
 
     @Bean
@@ -61,31 +54,18 @@ public class SecurityConfiguration {
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Libera os endpoints do Swagger
                         .requestMatchers(SWAGGER_ENDPOINTS).permitAll()
-
-                        // Libera criação de usuário e login sem token
-                        .requestMatchers(AUTENTICACAO_ENDPOINTS).permitAll()
-
-                        .requestMatchers(ENDPOINTS_SEM_AUTENTICACAO).permitAll()
-
-                        .requestMatchers(ENDPOINTS_WEB_PAGES).permitAll()
-
-
-                        // Endpoints de teste com suas respectivas permissões
+                        .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                        
                         .requestMatchers("/api/usuarios/test").authenticated()
-                        .requestMatchers("/api/usuarios/test/customer").hasRole("CUSTOMER")
-
-                        // Qualquer outra requisição não listada acima exigirá autenticação
                         .anyRequest().authenticated()
                 )
-
-                // Adiciona o filtro JWT antes do filtro padrão do Spring
                 .addFilterBefore(userAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
+    
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
@@ -99,10 +79,7 @@ public class SecurityConfiguration {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-
-        // Permite qualquer origem (celular, emulador, web) em desenvolvimento
         configuration.setAllowedOriginPatterns(List.of("*"));
-
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowCredentials(true);
         configuration.addAllowedHeader("*");
