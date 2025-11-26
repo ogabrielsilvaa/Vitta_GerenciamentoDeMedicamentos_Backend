@@ -61,8 +61,11 @@ RUN chmod +x gradlew
 # 2.7) Rodar o Gradle (Build Nativo)
 WORKDIR /vittaFrontend/android
 RUN chmod +x gradlew
-# Adicionamos flag para limitar o Java a 4GB (ajuste conforme sua RAM) e evitar travar o sistema
-RUN ./gradlew assembleDebug -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=512m"
+
+# ALTERAÇÃO AQUI:
+# Adicionamos -PnewArchEnabled=false para forçar o Reanimated a aceitar a arquitetura antiga
+# Mantemos o limite de memória do Java (-Xmx4g)
+RUN ./gradlew assembleDebug -PnewArchEnabled=false -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=512m"
 
 #########################################
 # 3) Imagem FINAL (Junta tudo)          #
