@@ -21,7 +21,8 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.gabriel_silva472.vitta"
+      "package": "com.gabriel_silva472.vitta",
+      "usesCleartextTraffic": true
     },
     "web": {
       "output": "static"
