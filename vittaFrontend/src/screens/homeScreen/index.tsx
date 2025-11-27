@@ -246,6 +246,7 @@ export default function HomeScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <Text style={{ color: "red" }}>{error}</Text>
+        <Text style={{ color: "red" }}>FAÇA LOGIN NOVAMENTE</Text>
         <View style={[styles.button, { marginTop: 20 }]}>
           <ActionButton
             titulo="SAIR (LOGOUT)"

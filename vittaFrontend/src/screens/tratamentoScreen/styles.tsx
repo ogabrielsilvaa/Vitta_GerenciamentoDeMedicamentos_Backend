@@ -34,6 +34,14 @@ export const styles = StyleSheet.create({
     justifyContent: "flex-start",
     paddingVertical: 10,
     gap: 16,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   textContainer: {
     flex: 1,

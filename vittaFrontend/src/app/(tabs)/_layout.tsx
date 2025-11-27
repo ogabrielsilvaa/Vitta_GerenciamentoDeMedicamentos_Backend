@@ -1,28 +1,25 @@
 import { CustomHeader } from "@/src/components/customHeader";
 import { useSession } from "@/src/contexts/authContext";
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { withLayoutContext } from "expo-router";
-import { useColorScheme } from "react-native";
-import { styles } from "./styles";
+import { StyleSheet, useColorScheme } from "react-native";
 
-export const Tabs = withLayoutContext(
-  createBottomTabNavigator().Navigator
-);
+export const Tabs = withLayoutContext(createBottomTabNavigator().Navigator);
 
 export default function TabsRootLayout() {
   const { isLoading } = useSession();
   const colorScheme = useColorScheme();
 
-  if(isLoading) {
+  if (isLoading) {
     return null;
   }
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#1CBDCF',
-        tabBarInactiveTintColor: 'gray',
+        tabBarActiveTintColor: "#1CBDCF",
+        tabBarInactiveTintColor: "gray",
         header: () => <CustomHeader />,
         tabBarStyle: styles.bottomTab,
       }}
@@ -30,10 +27,16 @@ export default function TabsRootLayout() {
       <Tabs.Screen
         name="medicamentos"
         options={{
-          title: 'Medicamentos',
-          tabBarIcon: ({ color, focused }: { color: string, focused: boolean }) => (
+          title: "Medicamentos",
+          tabBarIcon: ({
+            color,
+            focused,
+          }: {
+            color: string;
+            focused: boolean;
+          }) => (
             <Ionicons
-              name={focused ? 'medkit' : 'medkit-outline'}
+              name={focused ? "medkit" : "medkit-outline"}
               size={28}
               color={color}
             />
@@ -44,10 +47,16 @@ export default function TabsRootLayout() {
       <Tabs.Screen
         name="home"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color, focused }: { color: string, focused: boolean }) => (
+          title: "Home",
+          tabBarIcon: ({
+            color,
+            focused,
+          }: {
+            color: string;
+            focused: boolean;
+          }) => (
             <Ionicons
-              name={focused ? 'home' : 'home-outline'}
+              name={focused ? "home" : "home-outline"}
               size={28}
               color={color}
             />
@@ -58,17 +67,36 @@ export default function TabsRootLayout() {
       <Tabs.Screen
         name="tratamentos"
         options={{
-          title: 'Tratamentos',
-          tabBarIcon: ({ color, focused }: { color: string, focused: boolean }) => (
+          title: "Tratamentos",
+          tabBarIcon: ({
+            color,
+            focused,
+          }: {
+            color: string;
+            focused: boolean;
+          }) => (
             <Ionicons
-              name={focused ? 'medical' : 'medical-outline'}
+              name={focused ? "medical" : "medical-outline"}
               size={28}
               color={color}
             />
           ),
         }}
       />
-
     </Tabs>
-  )
+  );
 }
+
+const styles = StyleSheet.create({
+  bottomTab: {
+    position: "absolute",
+    borderRadius: 10,
+    height: 110,
+    elevation: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    backgroundColor: "#fff",
+  },
+});

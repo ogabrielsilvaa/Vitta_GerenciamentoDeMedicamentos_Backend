@@ -34,6 +34,14 @@ export const styles = StyleSheet.create ({
     width: 350,
     justifyContent: "space-between",
     paddingVertical: 10,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   textContent: {
     color: '#fff',

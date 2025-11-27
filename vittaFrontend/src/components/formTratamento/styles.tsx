@@ -9,6 +9,14 @@ export const styles = StyleSheet.create({
     backgroundColor: '#1CBDCF',
     borderRadius: 20,
     margin: 16,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   formRequestBody: {
     gap: 1,
