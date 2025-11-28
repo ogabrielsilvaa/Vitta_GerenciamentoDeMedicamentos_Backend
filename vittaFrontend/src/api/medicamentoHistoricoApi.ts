@@ -1,10 +1,9 @@
 import { Asset } from 'expo-asset';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
+import * as FileSystem from 'expo-file-system';
 import { Alert } from "react-native";
 import { apiManager } from "./apiManager";
-
-import { readAsStringAsync } from 'expo-file-system/legacy';
 
 const vittaLogoImage = require('../assets/images/logo_vitta.png'); 
 
@@ -24,15 +23,22 @@ export const gerarRelatorioPDF = async (token: string) => {
     }
 
     console.log("2. Processando imagem...");
+    let logoSrcBase64 = null;
 
-    const asset = Asset.fromModule(vittaLogoImage);
-    await asset.downloadAsync();
+    try {
+        const asset = Asset.fromModule(vittaLogoImage);
+        
+        await asset.downloadAsync();
 
-    const base64Data = await readAsStringAsync(asset.localUri || asset.uri, {
-        encoding: 'base64' as any 
-    });
-
-    const logoSrcBase64 = `data:image/png;base64,${base64Data}`;
+        if (asset.localUri) {
+            const base64Data = await FileSystem.readAsStringAsync(asset.localUri, {
+                encoding: 'base64' 
+            });
+            logoSrcBase64 = `data:image/png;base64,${base64Data}`;
+        }
+    } catch (imgError) {
+        console.warn("Erro ao processar imagem do logo:", imgError);
+    }
 
     console.log("3. Gerando HTML...");
     
@@ -59,7 +65,7 @@ export const gerarRelatorioPDF = async (token: string) => {
   }
 };
 
-const criarHtml = (dados: any[], logoSrc: string) => {
+const criarHtml = (dados: any[], logoSrc: string | null) => {
   const dataAtual = new Date();
   const nomeMes = dataAtual.toLocaleString("pt-BR", { month: "long" });
   const mesFormatado = nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1);
@@ -93,6 +99,10 @@ const criarHtml = (dados: any[], logoSrc: string) => {
     `;
   }).join('');
 
+  const logoHtml = logoSrc 
+    ? `<div class="logo-container"><img src="${logoSrc}" class="logo-img" alt="Vitta Logo" /></div>` 
+    : '';
+
   return `
     <html>
       <head>
@@ -114,9 +124,7 @@ const criarHtml = (dados: any[], logoSrc: string) => {
       </head>
       <body>
         
-        <div class="logo-container">
-            <img src="${logoSrc}" class="logo-img" alt="Vitta Logo" />
-        </div>
+        ${logoHtml}
         
         <h1>${tituloRelatorio}</h1>
         <p class="data">Gerado em: ${hojeString}</p>
