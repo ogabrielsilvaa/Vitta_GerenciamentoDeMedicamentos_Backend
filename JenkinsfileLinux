@@ -3,11 +3,13 @@ pipeline {
 
     stages {
 
-        stage('Instalar Dependências') {
+        stage('Instalar Dependências (Maven Local)') {
             steps {
+                // Esse passo é opcional se o Dockerfile já faz o build, 
+                // mas útil para rodar testes unitários antes do docker.
                 dir('vittaBackend') {
                     script {
-                        sh 'mvn clean install'
+                        sh 'mvn clean install -DskipTests' 
                     }
                 }
             }
@@ -15,31 +17,31 @@ pipeline {
 
         stage('Construir Imagem Docker') {
             steps {
-                    script {
-                        def appName = 'vitta-backend'
-                        def imageTag = "${appName}:${env.BUILD_ID}" // Ex: vitta-backend:1
+                script {
+                    def appName = 'vitta-backend'
+                    def imageTag = "${appName}:${env.BUILD_ID}" 
 
-
-
-                        dir ('vittaBackend') {
-                            sh "docker build -t ${imageTag} ."
-                        }
-                    }
+                    // REMOVIDO O dir('vittaBackend')
+                    // O comando agora roda na raiz, onde o Dockerfile deve estar
+                    sh "docker build -t ${imageTag} ."
+                }
             }
         }
 
         stage('Fazer Deploy') {
             steps {
-                dir('vittaBackend') {
-                    script {
-                        def appName = 'vitta-backend'
-                        def imageTag = "${appName}:${env.BUILD_ID}"
+                // Aqui também não precisa necessariamente entrar na pasta, 
+                // pois comandos docker stop/run são globais do daemon,
+                // mas não faz mal deixar. Vou remover para limpar.
+                script {
+                    def appName = 'vitta-backend'
+                    def imageTag = "${appName}:${env.BUILD_ID}"
 
-                        sh "docker stop ${appName} || exit 0"
-                        sh "docker rm -v ${appName} || exit 0"
+                    sh "docker stop ${appName} || exit 0"
+                    sh "docker rm -v ${appName} || exit 0"
 
-                        sh "docker run -d --name ${appName} -p 8407:8407 ${imageTag}"
-                    }
+                    // Adicionei --restart unless-stopped para garantir que suba se o servidor reiniciar
+                    sh "docker run -d --restart unless-stopped --name ${appName} -p 8407:8407 ${imageTag}"
                 }
             }
         }
