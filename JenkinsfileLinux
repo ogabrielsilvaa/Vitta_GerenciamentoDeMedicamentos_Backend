@@ -1,49 +1,55 @@
 pipeline {
     agent any
 
-    environment {
-        APP_NAME = 'vitta-app'
-        IMAGE_TAG = "${APP_NAME}:${BUILD_ID}"
-    }
-
     stages {
-        stage('Verificar Repositório') {
-            steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/main']], useRemoteConfigs: [[url: 'https://github.com/oj0rel/Vitta_GerenciamentoDeMedicamentos_Backend']]])
-            }
-        }
 
-        stage('Construir Imagem Full Stack') {
+        stage('Instalar Dependências') {
             steps {
-                script {
-                    echo "Iniciando build do Backend (Java) e Frontend (APK Localmente)..."
-                    
-                    // Removido o withCredentials e o argumento EXPO_TOKEN
-                    // O Dockerfile "Full Power" (com Android SDK) não precisa de token para rodar o ./gradlew
-                    sh "docker build -t ${env.IMAGE_TAG} ."
+                dir('vittaBackend') {
+                    script {
+                        sh 'mvn clean install'
+                    }
                 }
             }
         }
 
-        stage('Deploy / Rodar') {
+        stage('Construir Imagem Docker') {
             steps {
-                script {
-                    sh "docker stop ${env.APP_NAME} || true"
-                    sh "docker rm -v ${env.APP_NAME} || true"
+                    script {
+                        def appName = 'vitta-backend'
+                        def imageTag = "${appName}:${env.BUILD_ID}" // Ex: vitta-backend:1
 
-                    // Roda a imagem final
-                    sh "docker run -d --name ${env.APP_NAME} -p 8407:8407 ${env.IMAGE_TAG}"
+
+
+                        dir ('vittaBackend') {
+                            sh "docker build -t ${imageTag} ."
+                        }
+                    }
+            }
+        }
+
+        stage('Fazer Deploy') {
+            steps {
+                dir('vittaBackend') {
+                    script {
+                        def appName = 'vitta-backend'
+                        def imageTag = "${appName}:${env.BUILD_ID}"
+
+                        sh "docker stop ${appName} || exit 0"
+                        sh "docker rm -v ${appName} || exit 0"
+
+                        sh "docker run -d --name ${appName} -p 8407:8407 ${imageTag}"
+                    }
                 }
             }
         }
     }
-    
     post {
         success {
-            echo 'Build completo! Backend rodando e APK gerado localmente dentro do container.'
+            echo 'Deploy realizado com sucesso!'
         }
         failure {
-            echo 'Falha no build.'
+            echo 'Houve um erro durante o deploy.'
         }
     }
 }
