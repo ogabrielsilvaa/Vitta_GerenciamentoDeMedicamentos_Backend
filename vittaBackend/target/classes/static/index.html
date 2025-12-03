@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vitta App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%); 
+            min-height: 100vh; 
+            color: #1F2937; 
+            line-height: 1.6; 
+        }
+
+        .container { 
+            max-width: 900px; 
+            margin: 0 auto; 
+            padding: 40px 20px; 
+        }
+
+        .header { 
+            text-align: center; 
+            padding: 30px 0 40px; 
+        }
+
+        .header-logo {
+            max-width: 140px;
+            height: auto;
+            margin-bottom: 20px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .header h1 { 
+            font-size: 2.8rem; 
+            margin-bottom: 10px; 
+            color: #0369A1; 
+            font-weight: 700; 
+            font-family: 'Poppins', sans-serif; 
+            letter-spacing: -0.5px; 
+        }
+
+        .header p { 
+            font-size: 1.25rem; 
+            color: #64748B; 
+            max-width: 600px; 
+            margin: 0 auto; 
+        }
+
+        .content { 
+            background: #FFFFFF; 
+            padding: 40px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 25px rgba(2, 132, 199, 0.15); 
+            margin: 20px 0; 
+            position: relative; 
+            overflow: hidden; 
+        }
+
+        .content::before { 
+            content: ""; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 6px; 
+            background: linear-gradient(90deg, #38BDF8, #0284C7, #0369A1); 
+        }
+
+        h2 { 
+            color: #0284C7; 
+            margin-bottom: 15px; 
+            font-size: 1.8rem; 
+            font-weight: 600; 
+            font-family: 'Poppins', sans-serif; 
+        }
+
+        h3 { 
+            color: #0369A1; 
+            margin: 40px 0 25px; 
+            font-size: 1.5rem; 
+            font-weight: 600; 
+            font-family: 'Poppins', sans-serif; 
+            border-bottom: 2px solid #F0F9FF;
+            padding-bottom: 10px;
+        }
+
+        p { 
+            margin-bottom: 16px; 
+            color: #334155; 
+            font-size: 1.05rem; 
+        }
+
+        .warning-alert { 
+            background: #EFF6FF; 
+            border-left: 4px solid #3B82F6; 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin: 0 0 30px 0; 
+            display: flex; 
+            align-items: flex-start; 
+            gap: 12px; 
+        }
+        .warning-icon { color: #2563EB; font-size: 1.5rem; flex-shrink: 0; }
+        .warning-content h4 { color: #1E40AF; margin-bottom: 5px; font-size: 1.1rem; font-weight: 600; font-family: 'Poppins', sans-serif; }
+        .warning-content p { color: #1E3A8A; margin: 0; font-size: 0.95rem; }
+
+        .about-container {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .about-text {
+            max-width: 800px;
+            margin: 0 auto 30px auto;
+            text-align: left;
+        }
+
+        .about-gallery {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .about-mockup {
+            width: 170px;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border: 4px solid #fff;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background-color: #f0f0f0;
+        }
+
+        .about-mockup:hover { 
+            transform: translateY(-5px) scale(1.02); 
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            z-index: 2;
+        }
+
+        .features-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 20px; 
+        }
+
+        .feature-card { 
+            background: #F8FAFC; 
+            padding: 25px; 
+            border-radius: 12px; 
+            border: 1px solid #E2E8F0; 
+            transition: all 0.3s ease; 
+        }
+
+        .feature-card:hover { 
+            transform: translateY(-5px); 
+            border-color: #0EA5E9;
+            background: #F0F9FF;
+        }
+
+        .feature-card h4 { 
+            color: #0369A1; 
+            margin-bottom: 10px; 
+            font-size: 1.15rem; 
+            font-weight: 600; 
+            font-family: 'Poppins', sans-serif; 
+        }
+
+        .tech-stack { 
+            display: flex; 
+            justify-content: center; 
+            margin: 40px 0; 
+            flex-wrap: wrap; 
+            gap: 15px; 
+        }
+
+        .tech-item { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            background: rgba(14, 165, 233, 0.1); 
+            padding: 10px 20px; 
+            border-radius: 30px; 
+            font-size: 0.95rem; 
+            color: #0369A1; 
+            font-weight: 500;
+        }
+
+        .install-btn { 
+            display: block; 
+            background: linear-gradient(to right, #0EA5E9, #0284C7); 
+            color: #FFFFFF; 
+            padding: 20px; 
+            text-decoration: none; 
+            border-radius: 12px; 
+            text-align: center; 
+            margin-top: 20px; 
+            font-weight: 600; 
+            font-size: 1.2rem; 
+            box-shadow: 0 6px 15px rgba(2, 132, 199, 0.4); 
+            transition: all 0.4s ease; 
+            font-family: 'Poppins', sans-serif; 
+        }
+
+        .install-btn:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 15px 35px rgba(2, 132, 199, 0.3); 
+        }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2.2rem; }
+            .content { padding: 30px 20px; }
+            .features-grid { grid-template-columns: 1fr; }
+            
+            .about-gallery {
+                gap: 10px;
+            }
+            .about-mockup {
+                width: 45%;
+                max-width: 150px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 15px; }
+            .header-logo { max-width: 120px; }
+            .header h1 { font-size: 1.8rem; }
+            .warning-alert { flex-direction: column; text-align: center; }
+            .tech-stack { flex-direction: column; width: 100%; }
+            .tech-item { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    
+    <div class="header">
+        <img src="/imgs/logo_vitta.png" alt="Vitta Logo" class="header-logo">
+        <h1>Vitta App</h1>
+        <p>Praticidade e segurança no controle da sua rotina medicamentosa</p>
+    </div>
+
+    <div class="content">
+        <div class="warning-alert">
+            <div class="warning-icon">ℹ️</div>
+            <div class="warning-content">
+                <h4>Informação de Uso</h4>
+                <p>O Vitta é uma ferramenta de auxílio para gestão pessoal. Ele ajuda na organização, mas <strong>não substitui a orientação do seu médico ou farmacêutico</strong>.</p>
+            </div>
+        </div>
+
+        <div class="about-container">
+            <div class="about-text">
+                <h2>📱 Sobre o Aplicativo</h2>
+                <p>O Vitta foi projetado para trazer tranquilidade ao seu dia a dia, auxiliando no controle de horários, dosagens e histórico de uso de seus medicamentos de forma simples e intuitiva.</p>
+                <p>Confira algumas telas do nosso aplicativo:</p>
+            </div>
+            
+            <div class="about-gallery">
+                <img src="/imgs/inicio.jpg" alt="Tela de Login/Início" class="about-mockup">
+                <img src="/imgs/home.jpg" alt="Tela Principal (Home)" class="about-mockup">
+                <img src="/imgs/medicamentos.jpg" alt="Lista de Medicamentos" class="about-mockup">
+                <img src="/imgs/tratamentos.jpg" alt="Detalhes do Tratamento" class="about-mockup">
+            </div>
+        </div>
+
+        <h3>🚀 Funcionalidades Principais</h3>
+        <div class="features-grid">
+            <div class="feature-card">
+                <h4>💊 Gestão de Medicamentos</h4>
+                <p>Cadastre seus remédios com detalhes de dosagem, instruções e fotos para fácil identificação.</p>
+            </div>
+            <div class="feature-card">
+                <h4>⏰ Alertas Inteligentes</h4>
+                <p>Receba notificações precisas na hora de tomar cada dose, evitando esquecimentos.</p>
+            </div>
+            <div class="feature-card">
+                <h4>📅 Histórico de Uso</h4>
+                <p>Mantenha um registro completo de doses tomadas, adiadas ou perdidas para seu controle.</p>
+            </div>
+            <div class="feature-card">
+                <h4>📦 Controle de Estoque</h4>
+                <p>Saiba exatamente quando seus medicamentos estão perto de acabar para repor a tempo.</p>
+            </div>
+        </div>
+
+        <div class="tech-stack">
+            <div class="tech-item">
+                <span>⚛️</span> <span>React Native</span>
+            </div>
+            <div class="tech-item">
+                <span>🌱</span> <span>Spring Boot</span>
+            </div>
+            <div class="tech-item">
+                <span>🔒</span> <span>Spring Security</span>
+            </div>
+        </div>
+
+        <a href="install.html" class="install-btn">
+            Ir para Instalação
+        </a>
+    </div>
+</div>
+</body>
+</html>
