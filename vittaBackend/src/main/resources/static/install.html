@@ -29,21 +29,39 @@
             border: 3px solid #ffffff;
         }
 
-        .app-icon-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 21px;
-        }
-        
+        .app-icon-img { width: 100%; height: 100%; object-fit: cover; border-radius: 21px; }
 
         .steps { margin: 28px 0; padding: 24px; background-color: #F0F9FF; border-radius: 12px; border: 1px solid rgba(2, 132, 199, 0.2); }
         .step { margin: 16px 0; padding-left: 32px; position: relative; font-size: 1.05rem; color: #334155; }
         .step::before { content: "✓"; position: absolute; left: 0; color: #0EA5E9; font-weight: bold; font-size: 1.2rem; background: #FFFFFF; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(2, 132, 199, 0.3); top: 2px; }
+
         .download-btn { display: block; background: linear-gradient(to right, #0EA5E9, #0284C7); color: #FFFFFF; padding: 20px; text-align: center; text-decoration: none; border-radius: 12px; margin: 28px 0; font-size: 1.4rem; font-weight: 600; box-shadow: 0 6px 15px rgba(2, 132, 199, 0.4); transition: all 0.4s ease; position: relative; overflow: hidden; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px; }
         .download-btn:hover { transform: translateY(-4px); box-shadow: 0 15px 35px rgba(2, 132, 199, 0.25); }
         .download-btn::after { content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); transition: 0.6s; }
         .download-btn:hover::after { left: 100%; }
+
+        .qr-section {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-top: 20px;
+            border-top: 1px dashed #cbd5e1;
+        }
+        .qr-title {
+            font-size: 0.95rem;
+            color: #64748B;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        .qr-img {
+            width: 150px;
+            height: 150px;
+            border: 4px solid #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            /* Placeholder background caso a imagem demore a carregar */
+            background-color: #f1f5f9;
+        }
+
         .back-link-container { text-align: center; }
         .back-link { display: inline-flex; align-items: center; gap: 6px; color: #0284C7; text-decoration: none; font-weight: 500; transition: all 0.3s; padding: 8px 0; border-bottom: 1px solid transparent; font-size: 1.05rem; }
         .back-link:hover { color: #0369A1; border-bottom: 1px solid #0369A1; gap: 8px; }
@@ -61,7 +79,7 @@
 <div class="card">
     <div class="app-icon">
         <div class="app-icon-circle">
-            <img src="../static/imgs/logo_vitta.png" alt="Ícone do Vitta App" class="app-icon-img">
+            <img src="/images/logo_vitta.png" alt="Ícone do Vitta App" class="app-icon-img">
         </div>
     </div>
 
@@ -75,10 +93,16 @@
         <div class="step">Toque em "Instalar" e aguarde a conclusão.</div>
     </div>
 
-    <a href="/download/app" class="download-btn">
+    <a href="/download/app" class="download-btn" download>
         📥 Baixar Vitta APK
     </a>
 
+    <div class="qr-section">
+        <p class="qr-title">Está no computador? Escaneie para baixar:</p>
+
+        <img src="/images/qrcode.png" alt="QR Code para Download" class="qr-img">
+
+    </div>
     <div class="back-link-container">
         <a href="index.html" class="back-link">← Voltar para a página inicial</a>
     </div>
