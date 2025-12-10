@@ -45,7 +45,8 @@ public class SecurityConfiguration {
             "/*.js",
             "/favicon.ico",
             "/assets/**",
-            "/images/**"
+            "/images/**",
+            "/videos/**"
     };
 
     @Bean

@@ -143,6 +143,32 @@
             box-shadow: 0 15px 30px rgba(0,0,0,0.2);
             z-index: 2;
         }
+        
+        .video-presentation {
+            text-align: center;
+            margin: 40px 0;
+            padding: 30px 0;
+            border-top: 1px solid #E2E8F0;
+            border-bottom: 1px solid #E2E8F0;
+            background-color: #F8FAFC;
+            border-radius: 12px;
+        }
+
+        .video-presentation h3 {
+            margin: 0 0 20px 0; 
+            border-bottom: none;
+            padding-bottom: 0;
+            font-size: 1.6rem;
+        }
+
+        .video-player {
+            width: 100%;
+            max-width: 680px; 
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            background-color: #000; 
+        }
 
         .features-grid { 
             display: grid; 
@@ -225,6 +251,9 @@
                 width: 45%;
                 max-width: 150px;
             }
+            .video-presentation {
+                padding: 20px 0;
+            }
         }
 
         @media (max-width: 480px) {
@@ -270,6 +299,16 @@
             </div>
         </div>
 
+        <div class="video-presentation">
+            <h3>🎬 Vitta em Ação!</h3>
+            
+            <video class="video-player" controls autoplay muted playsinline>
+                <source src="videos/vitta.mp4" type="video/mp4">
+                
+                Seu navegador não suporta vídeos HTML5.
+            </video>
+            <p style="margin-top: 15px; font-size: 0.9rem; color: #64748B;">Assista a uma demonstração rápida das principais funções.</p>
+        </div>
         <h3>🚀 Funcionalidades Principais</h3>
         <div class="features-grid">
             <div class="feature-card">
